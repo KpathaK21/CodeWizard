@@ -112,5 +112,5 @@ if __name__ == '__main__':
             }, f, indent=2)
     
     # Bind to all interfaces (0.0.0.0) instead of just localhost
-    # Use port 8000 instead of 5000 to avoid conflict with macOS AirPlay Receiver
-    app.run(host='0.0.0.0', port=8000, debug=True)
+    # Use port 5050
+    app.run(host='0.0.0.0', port=5050, debug=True)

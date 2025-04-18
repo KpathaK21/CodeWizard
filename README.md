@@ -58,7 +58,7 @@ The script will:
 - Install and build the frontend
 - Create a `.env` file if needed
 - Start the application
-- Open your browser to http://localhost:8000
+- Open your browser to http://localhost:5050
 
 ### For Developers
 

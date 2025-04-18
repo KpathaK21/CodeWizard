@@ -151,13 +151,13 @@ def run_application():
     # Open the application in the default web browser
     print("🌐 Opening CodeWizard in your browser...")
     if platform.system() == "Darwin":  # macOS
-        subprocess.run(["open", "http://localhost:8000"])
+        subprocess.run(["open", "http://localhost:5050"])
     elif platform.system() == "Windows":
-        subprocess.run(["start", "http://localhost:8000"], shell=True)
+        subprocess.run(["start", "http://localhost:5050"], shell=True)
     elif platform.system() == "Linux":
-        subprocess.run(["xdg-open", "http://localhost:8000"])
+        subprocess.run(["xdg-open", "http://localhost:5050"])
     else:
-        print("Please open http://localhost:8000 in your browser")
+        print("Please open http://localhost:5050 in your browser")
     
     try:
         # Keep the application running until Ctrl+C is pressed
