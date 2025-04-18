@@ -1,0 +1,76 @@
+.App {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.message-user {
+  align-self: flex-end;
+  background-color: #2196f3;
+  color: white;
+  border-radius: 18px 18px 0 18px;
+  padding: 10px 15px;
+  margin: 5px 0;
+  max-width: 70%;
+}
+
+.message-assistant {
+  align-self: flex-start;
+  background-color: #f0f0f0;
+  border-radius: 18px 18px 18px 0;
+  padding: 10px 15px;
+  margin: 5px 0;
+  max-width: 70%;
+}
+
+.message-assistant pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.message-assistant code {
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.message-assistant pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+/* Mode-specific colors */
+.mode-code {
+  --mode-color: #2196f3;
+}
+
+.mode-ask {
+  --mode-color: #4caf50;
+}
+
+.mode-architect {
+  --mode-color: #9c27b0;
+}
+
+.mode-debug {
+  --mode-color: #f44336;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
