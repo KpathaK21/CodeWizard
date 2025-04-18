@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import {
-  Container, Box, TextField, Button, Typography, Paper, 
+  Container, Box, TextField, Button, Typography, Paper,
   AppBar, Toolbar, IconButton, Select, MenuItem, FormControl,
-  InputLabel, CircularProgress, Divider, Chip
+  InputLabel, CircularProgress, Divider, Chip, Dialog, DialogTitle,
+  DialogContent, DialogActions, DialogContentText
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import BugReportIcon from '@mui/icons-material/BugReport';
+import SettingsIcon from '@mui/icons-material/Settings';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -19,6 +21,9 @@ function App() {
   const [mode, setMode] = useState('debug');
   const [provider, setProvider] = useState('openai');
   const [model, setModel] = useState('gpt-4o');
+  const [openaiApiKey, setOpenaiApiKey] = useState(localStorage.getItem('openaiApiKey') || '');
+  const [anthropicApiKey, setAnthropicApiKey] = useState(localStorage.getItem('anthropicApiKey') || '');
+  const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
   const [availableModels, setAvailableModels] = useState({
     openai: ['gpt-3.5-turbo', 'gpt-4o', 'gpt-4-turbo'],
     anthropic: ['claude-3-opus', 'claude-3-sonnet', 'claude-3-haiku']
@@ -50,6 +55,37 @@ function App() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
   
+  // Handle API key changes
+  const handleOpenaiApiKeyChange = (event) => {
+    const newKey = event.target.value;
+    setOpenaiApiKey(newKey);
+    localStorage.setItem('openaiApiKey', newKey);
+  };
+  
+  const handleAnthropicApiKeyChange = (event) => {
+    const newKey = event.target.value;
+    setAnthropicApiKey(newKey);
+    localStorage.setItem('anthropicApiKey', newKey);
+  };
+  
+  const handleOpenApiKeyDialog = () => {
+    setShowApiKeyDialog(true);
+  };
+  
+  const handleCloseApiKeyDialog = () => {
+    setShowApiKeyDialog(false);
+  };
+  
+  // Check if API key is available for the selected provider
+  const isApiKeyAvailable = () => {
+    if (provider === 'openai') {
+      return openaiApiKey.trim() !== '';
+    } else if (provider === 'anthropic') {
+      return anthropicApiKey.trim() !== '';
+    }
+    return false;
+  };
+  
   // Handle provider change
   const handleProviderChange = (event) => {
     const newProvider = event.target.value;
@@ -58,6 +94,13 @@ function App() {
     // Set default model for the selected provider
     if (availableModels[newProvider] && availableModels[newProvider].length > 0) {
       setModel(availableModels[newProvider][0]);
+    }
+    
+    // Show API key dialog if key is not set
+    if (newProvider === 'openai' && openaiApiKey.trim() === '') {
+      setShowApiKeyDialog(true);
+    } else if (newProvider === 'anthropic' && anthropicApiKey.trim() === '') {
+      setShowApiKeyDialog(true);
     }
   };
   
@@ -82,6 +125,12 @@ function App() {
     
     if (!input.trim()) return;
     
+    // Check if API key is available
+    if (!isApiKeyAvailable()) {
+      setShowApiKeyDialog(true);
+      return;
+    }
+    
     // Add user message to chat
     const userMessage = { role: 'user', content: input };
     setMessages([...messages, userMessage]);
@@ -89,17 +138,21 @@ function App() {
     setLoading(true);
     
     try {
+      // Get the appropriate API key
+      const apiKey = provider === 'openai' ? openaiApiKey : anthropicApiKey;
+      
       // Send request to backend
       const response = await axios.post('/api/chat', {
         provider,
         model,
         mode,
+        apiKey,
         messages: [...messages, userMessage]
       });
       
       // Add assistant response to chat
       setMessages(prevMessages => [
-        ...prevMessages, 
+        ...prevMessages,
         { role: 'assistant', content: response.data.response }
       ]);
     } catch (error) {
@@ -107,12 +160,19 @@ function App() {
       
       // Add error message to chat
       setMessages(prevMessages => [
-        ...prevMessages, 
-        { 
-          role: 'assistant', 
+        ...prevMessages,
+        {
+          role: 'assistant',
           content: `⚠️ Error: ${error.response?.data?.error || error.message || 'Unknown error'}`
         }
       ]);
+      
+      // If the error is related to the API key, show the dialog
+      if (error.response?.status === 401 ||
+          error.response?.data?.error?.includes('API key') ||
+          error.message?.includes('API key')) {
+        setShowApiKeyDialog(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -168,8 +228,19 @@ function App() {
             {getModeIcon()}
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Dr.Debug
+            CodeWizard
           </Typography>
+          
+          {/* API Key Settings Button */}
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleOpenApiKeyDialog}
+            startIcon={<SettingsIcon />}
+            sx={{ mr: 2, backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
+          >
+            API Keys
+          </Button>
           
           {/* Mode Selection */}
           <FormControl variant="outlined" size="small" sx={{ minWidth: 120, mr: 2, backgroundColor: 'rgba(255, 255, 255, 0.15)' }}>
@@ -252,7 +323,7 @@ function App() {
               >
                 <BugReportIcon sx={{ fontSize: 60, mb: 2, color: getModeColor(mode) }} />
                 <Typography variant="h5" gutterBottom>
-                  Welcome to Dr.Debug!
+                  Welcome to CodeWizard!
                 </Typography>
                 <Typography variant="body1" align="center">
                   Paste your error message, stack trace, or buggy code below to get started.
@@ -269,14 +340,14 @@ function App() {
                     alignItems: message.role === 'user' ? 'flex-end' : 'flex-start'
                   }}
                 >
-                  <Chip 
-                    label={message.role === 'user' ? 'You' : 'Dr.Debug'} 
-                    size="small" 
-                    sx={{ 
+                  <Chip
+                    label={message.role === 'user' ? 'You' : 'CodeWizard'}
+                    size="small"
+                    sx={{
                       mb: 1,
                       backgroundColor: message.role === 'user' ? 'primary.main' : getModeColor(mode),
                       color: 'white'
-                    }} 
+                    }}
                   />
                   <Paper 
                     elevation={1} 
@@ -327,6 +398,45 @@ function App() {
           </Box>
         </Paper>
       </Container>
+      
+      {/* API Key Dialog */}
+      <Dialog open={showApiKeyDialog} onClose={handleCloseApiKeyDialog}>
+        <DialogTitle>API Key Settings</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Please enter your API keys for the LLM providers you want to use.
+            Your keys are stored locally in your browser and are never sent to our servers.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="openai-api-key"
+            label="OpenAI API Key"
+            type="password"
+            fullWidth
+            variant="outlined"
+            value={openaiApiKey}
+            onChange={handleOpenaiApiKeyChange}
+            sx={{ mt: 2 }}
+          />
+          <TextField
+            margin="dense"
+            id="anthropic-api-key"
+            label="Anthropic API Key"
+            type="password"
+            fullWidth
+            variant="outlined"
+            value={anthropicApiKey}
+            onChange={handleAnthropicApiKeyChange}
+            sx={{ mt: 2 }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseApiKeyDialog} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

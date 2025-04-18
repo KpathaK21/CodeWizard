@@ -1,6 +1,6 @@
 {
-  "short_name": "Dr.Debug",
-  "name": "Dr.Debug - AI Debugging Assistant",
+  "short_name": "CodeWizard",
+  "name": "CodeWizard - AI Debugging Assistant",
   "icons": [
     {
       "src": "favicon.ico",

@@ -4,11 +4,13 @@ import os
 import anthropic
 
 class AnthropicModel:
-    def __init__(self, model_name):
+    def __init__(self, model_name, api_key=None):
         self.model_name = model_name
-        self.api_key = os.getenv("ANTHROPIC_API_KEY")
+        
+        # Use provided API key or fall back to environment variable
+        self.api_key = api_key or os.getenv("ANTHROPIC_API_KEY")
         if not self.api_key:
-            raise ValueError("Please set the ANTHROPIC_API_KEY environment variable.")
+            raise ValueError("API key is required. Please provide an API key or set the ANTHROPIC_API_KEY environment variable.")
         
         self.client = anthropic.Anthropic(api_key=self.api_key)
     

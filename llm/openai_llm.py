@@ -4,11 +4,13 @@ from openai import OpenAI
 import os
 
 class OpenAIModel:
-    def __init__(self, model_name):
+    def __init__(self, model_name, api_key=None):
         self.model_name = model_name
-        self.api_key = os.getenv("OPENAI_API_KEY")
+        
+        # Use provided API key or fall back to environment variable
+        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         if not self.api_key:
-            raise ValueError("Please set the OPENAI_API_KEY environment variable.")
+            raise ValueError("API key is required. Please provide an API key or set the OPENAI_API_KEY environment variable.")
         
         self.client = OpenAI(api_key=self.api_key)
     

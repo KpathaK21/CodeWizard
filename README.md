@@ -1,6 +1,6 @@
-# Dr.Debug - AI Debugging Assistant
+# CodeWizard - AI Debugging Assistant
 
-Dr.Debug is an AI-powered debugging assistant that helps developers identify and fix issues in their code. It supports multiple modes (Code, Ask, Architect, Debug) and allows users to select different LLM models for responses.
+CodeWizard is an AI-powered debugging assistant that helps developers identify and fix issues in their code. It supports multiple modes (Code, Ask, Architect, Debug) and allows users to select different LLM models for responses.
 
 ## Features
 
@@ -16,7 +16,12 @@ Dr.Debug is an AI-powered debugging assistant that helps developers identify and
 
 - **Interactive Chat Interface**: User-friendly interface for submitting code and errors
 
-## Setup
+- **User-Provided API Keys**: Users can provide their own API keys for OpenAI and Anthropic models, ensuring:
+  - Better security (no shared API keys)
+  - Individual usage quotas
+  - Privacy (API keys are stored locally in the browser)
+
+## Setup & Running
 
 ### Prerequisites
 
@@ -26,69 +31,63 @@ Dr.Debug is an AI-powered debugging assistant that helps developers identify and
 - OpenAI API key
 - Anthropic API key (optional)
 
-### Backend Setup
+### One-Step Setup & Run
+
+CodeWizard now features a single executable script that handles everything:
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/Dr.Debug.git
-   cd Dr.Debug
+   git clone https://github.com/yourusername/CodeWizard.git
+   cd CodeWizard
    ```
 
-2. Create a virtual environment and activate it:
+2. Make the script executable (if needed):
    ```
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. Install the required Python packages:
-   ```
-   pip install -r requirements.txt
+   chmod +x codewizard
    ```
 
-4. Create a `.env` file based on `.env.example` and add your API keys:
+3. Run the CodeWizard script:
    ```
-   cp .env.example .env
-   # Edit .env file to add your API keys
-   ```
-
-### Frontend Setup
-
-1. Navigate to the frontend directory:
-   ```
-   cd frontend
+   ./codewizard
    ```
 
-2. Install the required npm packages:
-   ```
-   npm install
-   ```
+The script will:
+- Check for all required dependencies
+- Set up a virtual environment if needed
+- Install Python dependencies
+- Install and build the frontend
+- Create a `.env` file if needed
+- Start the application
+- Open your browser to http://localhost:8000
 
-3. Build the frontend:
-   ```
-   npm run build
-   ```
+### For Developers
 
-## Running the Application
+If you're developing or modifying CodeWizard:
 
-1. Start the Flask backend server:
-   ```
-   python app.py
-   ```
-
-2. For development, you can run the frontend separately:
+1. You can run the frontend separately in development mode:
    ```
    cd frontend
    npm start
    ```
+   This will be accessible at `http://localhost:3000`
 
-3. Access the application at `http://localhost:5000` (or `http://localhost:3000` if running the frontend separately in development mode)
+2. You can manually start the backend:
+   ```
+   python app.py
+   ```
 
 ## Usage
 
 1. Select your preferred mode (Code, Ask, Architect, Debug)
 2. Choose the LLM provider and model
-3. Enter your code, error message, or question in the input field
-4. Receive AI-generated responses with suggestions and solutions
+3. Click the settings icon to enter your API keys:
+   - For OpenAI models, enter your OpenAI API key
+   - For Anthropic models, enter your Anthropic API key
+   - API keys are stored securely in your browser's local storage
+4. Enter your code, error message, or question in the input field
+5. Receive AI-generated responses with suggestions and solutions
+
+> **Note**: If you don't provide an API key, you'll be prompted to enter one when you try to send a message.
 
 ## Contributing
 
